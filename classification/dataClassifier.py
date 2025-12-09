@@ -72,13 +72,71 @@ def enhancedFeatureExtractorDigit(datum):
     for this datum (datum is of type samples.Datum).
 
     ## DESCRIBE YOUR ENHANCED FEATURES HERE...
-
+    Continueous regions of white spaces (number of disjoint white regions)
+        3 - binary variable (only one of these can be one at one time)
+            has1WhiteSpace -  [0, 1] (1, 2, 3, 4, 5, 7)
+            has2WhiteSpace -  [0, 1] (0, 4, 6, 9)
+            has3WhiteSpace -  [0, 1] (8)
+    #
     ##
     """
     features =  basicFeatureExtractorDigit(datum)
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    visitedNodes = set()
+    counter = 0
+    fringe = util.Queue()
+
+    has1WhiteSpace = 0
+    has2WhiteSpace = 0
+    has3WhiteSpace = 0
+    
+    while True:
+
+        # get the first black node in features
+        startNode = None
+        for key in features.keys():
+            if features[key] == 0 and key not in visitedNodes:
+                startNode = key
+                visitedNodes.add(key)
+                fringe.push(key)
+                break
+
+        # if no black node not in visitedSet: break
+        if startNode is None: 
+            break
+        
+        # loop through neighbors queue
+        while not fringe.isEmpty():
+            currentNode = fringe.pop()  
+
+            # get 4 possible adjacent moves
+            x, y = currentNode
+            possibleMoves = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+            
+            for move in possibleMoves:
+                # if moves are black and moves are not in the visistedSet:  add to queue and visitedSet
+                if move in features.keys() and features[move] == 0 and move not in visitedNodes:
+                    visitedNodes.add(move)
+                    fringe.push(move)               
+                
+
+        # increment ur counter and restart loop
+        counter += 1
+    
+    if counter == 1:
+        has1WhiteSpace = 1
+    elif counter == 2:
+        has2WhiteSpace = 1
+    elif counter == 3:
+        has3WhiteSpace = 1
+
+    features["has1WhiteSpace"] = has1WhiteSpace
+    features["has2WhiteSpace"] = has2WhiteSpace
+    features["has3WhiteSpace"] = has3WhiteSpace
+
+    
 
     return features
 
@@ -164,18 +222,25 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
     (and you can modify the signature if you want).
     """
 
+    # print(rawTestData[0])
     # Put any code here...
     # Example of use:
+
+    # counter = 0
     # for i in range(len(guesses)):
     #     prediction = guesses[i]
     #     truth = testLabels[i]
+
+    #     # if counter > 3:
+    #     #     break
+
     #     if (prediction != truth):
-    #         print "==================================="
-    #         print "Mistake on example %d" % i
-    #         print "Predicted %d; truth is %d" % (prediction, truth)
-    #         print "Image: "
-    #         print rawTestData[i]
-    #         break
+    #         counter += 1
+    #         print("===================================")
+    #         print("Mistake on example %d" % i)
+    #         print("Predicted %d; truth is %d" % (prediction, truth))
+    #         print("Image: ")
+    #         print(rawTestData[i])
 
 
 ## =====================
